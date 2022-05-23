@@ -9,26 +9,28 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    protected $model;
+
+    public function __construct(User $user)
+    {
+        $this->model = $user;    
+    }
+
     public function index (Request $request){
 
         // Captura o valor inserido no campo de pesquisa (independente se existir ou não)
-        $search = $request->search;
+        $search = $request->search ?? '';
 
-        // CRIA UM FILTRO para pesquisar os usuarios pelo email ou pelo nome        
-        $users = User::where(function ($query) use ($search){
-            if($search){
-                $query->where('email',$search);
-                $query->orWhere('name','LIKE',"%{$search}%");
-            }
-        })->get();
+        // Aplica um filtro para buscar os usuarios
+        $users = $this->model->getUsers(search: $search);
 
         return view('users.index', compact('users'));
     }
 
     public function show($id){
 
-        //$user = User::where('id', $id)->first(); // ou
-        if(!$user = User::find($id)){
+        //$user = $this->model->where('id', $id)->first(); // ou
+        if(!$user = $this->model->find($id)){
             return redirect()->route('users.index');
         }
         //dd($user);
@@ -44,13 +46,13 @@ class UserController extends Controller
         $data = $request->all();
         $data['password'] = bcrypt($request->password);
 
-        User::create($data);
+        $this->model->create($data);
 
         return redirect()->route('users.index');
     }
 
     public function edit($id){
-        if(!$user = User::find($id)){
+        if(!$user = $this->model->find($id)){
             return redirect()->route('users.index');
         }
 
@@ -58,7 +60,7 @@ class UserController extends Controller
     }
 
     public function update(StoreUpdateUserFormRequest $request, $id){
-        if(!$user = User::find($id)){
+        if(!$user = $this->model->find($id)){
             return redirect()->route('users.index');
         }
 
@@ -73,14 +75,27 @@ class UserController extends Controller
         return redirect()->route('users.index');
     }
 
-    public function destroy($id){
+    public function delete($id){
 
-        if(!$user = User::find($id)){
+        if(!$user = $this->model->find($id)){
             return redirect()->route('users.index');
         }
         
         $user->delete();
 
         return redirect()->route('users.index');
+    }
+
+    // CRIA UM FILTRO para pesquisar os usuarios pelo email ou pelo nome  
+    public function getUsers(string|null $search = null){
+
+        $users = $this->where(function ($query) use ($search){
+            if($search){
+                $query->where('email',$search);
+                $query->orWhere('name','LIKE',"%{$search}%");
+            }
+        })->get();
+
+        return $users;
     }
 }

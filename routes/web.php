@@ -6,7 +6,7 @@ use App\Http\Controllers\{
     UserController
 };
 
-Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+Route::delete('/users/{id}', [UserController::class, 'delete'])->name('users.delete');
 
 Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
 
