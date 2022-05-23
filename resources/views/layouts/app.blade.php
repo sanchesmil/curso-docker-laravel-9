@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title') - EspecializaTi</title>
 
-    <link rel="shortcut icon" href="{{utl('images/favicon.ico')}}" type="image/png">
+    <link rel="shortcut icon" href="{{url('images/favicon.ico')}}" type="image/png">
 
     <!-- Faz o import do Tailwind via CDN-->
     <script src="https://cdn.tailwindcss.com"></script>
